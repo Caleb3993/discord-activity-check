@@ -3,7 +3,6 @@ export default async function handler(req, res) {
     return res.status(405).send("Method not allowed");
   }
 
-  // Protect the webhook from unauthorized requests.
   const secret = process.env.CRON_SECRET;
 
   if (!secret || req.headers.authorization !== `Bearer ${secret}`) {
@@ -16,17 +15,20 @@ export default async function handler(req, res) {
     return res.status(500).send("Webhook URL is not configured");
   }
 
-  const message =
-    "# @everyone ACTIVITY CHECK\n" +
-    "**Put a check so I know you’re active! " +
-    "This gives you a better chance of getting mod**";
+  const test = req.query.test === "1";
+
+  const content = test
+    ? "Test successful! Your Discord webhook and Vercel function are connected. No @everyone ping was sent."
+    : "@everyone ACTIVITY CHECK DAY 5\n" +
+      "**Put a check so I know you’re active! " +
+      "This gives you a better chance of getting mod**";
 
   const response = await fetch(webhook, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      content: message,
-      allowed_mentions: { parse: ["everyone"] }
+      content,
+      allowed_mentions: { parse: test ? [] : ["everyone"] }
     })
   });
 
@@ -35,5 +37,5 @@ export default async function handler(req, res) {
     return res.status(502).send("Discord rejected the message");
   }
 
-  return res.status(200).send("Activity check sent!");
+  return res.status(200).send(test ? "Test message sent!" : "Activity check sent!");
 }
