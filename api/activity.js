@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
   const content = test
     ? "Test successful! Your Discord webhook and Vercel function are connected. No @everyone ping was sent."
-    : "@everyone ACTIVITY CHECK DAY 5\n" +
+    : "# @everyone ACTIVITY CHECK!\n" +
       "**Put a check so I know you’re active! " +
       "This gives you a better chance of getting mod**";
 
